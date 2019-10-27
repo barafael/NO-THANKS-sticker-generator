@@ -2,20 +2,21 @@
 <html>
 <head>
 
-    <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c|Varela+Round&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c|Varela+Round&amp;display=swap" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
     <title>
         Contrarian Sticker Generator
     </title>
     <style>
         #main {
             display: block;
-            width: 80%;
+            width: 100%;
         }
         input[type=text] {
             border: none;
-            width: 80%;
+            width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
             box-sizing: border-box;
@@ -26,7 +27,7 @@
         button[type=button] {
             border: solid;
             border-radius: 2px;
-            width: 80%;
+            width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
             box-sizing: border-box;
@@ -50,28 +51,20 @@
     </a>
 
     <script>
-        function drawTextAlongArcLow(context, str, centerX, centerY, radius, angle, low=true) {
+        function drawTextAlongArc(context, str, centerX, centerY, radius, angle, low=true) {
             context.save();
             context.translate(centerX, centerY);
             context.rotate(-1 * angle / 2);
             var strLen = context.measureText(str).width;
             for (var n = 0; n < str.length; n++) {
-                var index;
-                if (low) {
-                    index = str.length - n - 1;
-                } else {
-                    index = n;
-                }
+                var index = low ? str.length - n - 1 : n;
                 var letter = str[index];
                 var letterLength = context.measureText(letter).width;
                 var rotation = (letterLength / strLen) / 2;
                 context.rotate(angle * rotation);
                 context.save();
-                if (low) {
-                    context.translate(0, 1 * radius);
-                } else {
-                    context.translate(0, -1 * radius);
-                }
+                var factor = low ? 1 : -1;
+                context.translate(0, factor * radius);
                 context.textBaseline = 'middle';
                 context.fillText(letter, 0, 0);
                 context.restore();
@@ -126,9 +119,9 @@
             var lowerLen = context.measureText(lower);
             var radius = canvas.height / 4.5;
             var upperAngle = Math.PI * upperLen.width / 55 / canvas.height * 100; // radians
-            drawTextAlongArcLow(context, upper, centerX, centerY, radius, upperAngle);
+            drawTextAlongArc(context, upper, centerX, centerY, radius, upperAngle);
             var lowerAngle = Math.PI * lowerLen.width / 55 / canvas.height * 100; // radians
-            drawTextAlongArcLow(context, lower, centerX, centerY, radius, lowerAngle, false);
+            drawTextAlongArc(context, lower, centerX, centerY, radius, lowerAngle, false);
         }
 
         function downloadImage() {
@@ -136,7 +129,6 @@
             var image = document.getElementById("smileCanvas").toDataURL("image/png")
                 .replace("image/png", "image/octet-stream");
             download.setAttribute("href", image);
-            //download.setAttribute("download","archive.png");
         }
 
         $(document).ready(function() {
