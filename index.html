@@ -59,12 +59,14 @@
             for (var n = 0; n < str.length; n++) {
                 var index = low ? str.length - n - 1 : n;
                 var letter = str[index];
-                var letterLength = context.measureText(letter).width;
-                var rotation = (letterLength / strLen) / 2;
+                var letterWidth = context.measureText(letter).width;
+                var rotation = (letterWidth / strLen) / 2;
+                // advance context by letter width angle
                 context.rotate(angle * rotation);
                 context.save();
-                var factor = low ? 1 : -1;
-                context.translate(0, factor * radius);
+                // depending on arc, choose direction
+                var direction = low ? 1 : -1;
+                context.translate(0, direction * radius);
                 context.textBaseline = 'middle';
                 context.fillText(letter, 0, 0);
                 context.restore();
@@ -91,6 +93,7 @@
             var centerY = canvas.height / 2;
             var radius = canvas.width / 3;
 
+            // draw yellow circle with black outline
             context.beginPath();
             context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
             context.fillStyle = 'yellow';
@@ -99,19 +102,22 @@
             context.strokeStyle = '#000000';
             context.stroke();
 
+            // load image for red radiation smiley
             const img = new Image();
             img.onload = function() {
                 const height = canvas.height / 2;
                 const width = canvas.width / 2;
                 context.drawImage(img, centerX - height / 2, centerY - width / 2, height, width);
             }
-            img.setAttribute('crossOrigin', 'anonymous');
             img.src = "https://i.ibb.co/NxNvnK7/evil-smiley.png";
+            // allow download canvas as image
+            img.setAttribute('crossOrigin', 'anonymous');
 
             var fontSize = Math.floor(canvas.height * 0.05) + "px ";
             context.font = fontSize + "Varela Round";
             context.textAlign = "center";
 
+            // Draw text
             context.fillStyle = "black";
             const upper = document.getElementById('upperTextInput').value;
             const lower = document.getElementById('lowerTextInput').value;
