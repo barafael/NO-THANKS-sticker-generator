@@ -1,3 +1,3 @@
 # Nein Danke - Sticker Generator
 
-Generate stickers
+![alt text](https://raw.githubusercontent.com/barafael/NO-THANKS-sticker-generator/master/screenshot1.png)
