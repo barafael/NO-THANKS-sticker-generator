@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
     <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c|Varela+Round&amp;display=swap" rel="stylesheet">
@@ -47,25 +48,27 @@
     <input type="text" placeholder="Pro Klo" id="upperTextInput" name="upper text" maxlength="30" size="10">
 
     <a id="download" download="sticker.png">
-        <button type="button" onClick="downloadImage()">Download</button>
+        <button type="button" onClick="downloadImage()">Download as image</button>
     </a>
 
     <script>
-        function drawTextAlongArc(context, str, centerX, centerY, radius, angle, low=true) {
+        let smiley;
+
+        function drawTextAlongArc(context, str, centerX, centerY, radius, angle, low = true) {
             context.save();
             context.translate(centerX, centerY);
             context.rotate(-1 * angle / 2);
-            var strLen = context.measureText(str).width;
-            for (var n = 0; n < str.length; n++) {
-                var index = low ? str.length - n - 1 : n;
-                var letter = str[index];
-                var letterWidth = context.measureText(letter).width;
-                var rotation = (letterWidth / strLen) / 2;
+            let strLen = context.measureText(str).width;
+            for (let n = 0; n < str.length; n++) {
+                let index = low ? str.length - n - 1 : n;
+                let letter = str[index];
+                let letterWidth = context.measureText(letter).width;
+                let rotation = (letterWidth / strLen) / 2;
                 // advance context by letter width angle
                 context.rotate(angle * rotation);
                 context.save();
                 // depending on arc, choose direction
-                var direction = low ? 1 : -1;
+                let direction = low ? 1 : -1;
                 context.translate(0, direction * radius);
                 context.textBaseline = 'middle';
                 context.fillText(letter, 0, 0);
@@ -76,22 +79,22 @@
         }
 
         function smileCanvas() {
-            var c = $('#smileCanvas');
-            var ct = c.get(0).getContext('2d');
-            var container = $(c).parent();
+            let c = $('#smileCanvas');
+            let ct = c.get(0).getContext('2d');
+            let container = $(c).parent();
             c.attr('width', $(container).width());
             c.attr('height', $(container).width());
 
-            var canvas = document.getElementById('smileCanvas');
+            let canvas = document.getElementById('smileCanvas');
 
-            var context = canvas.getContext('2d');
+            let context = canvas.getContext('2d');
 
             context.fillStyle = "white";
             context.fillRect(0, 0, canvas.width, canvas.height);
 
-            var centerX = canvas.width / 2;
-            var centerY = canvas.height / 2;
-            var radius = canvas.width / 3;
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let radius = canvas.width / 3;
 
             // draw yellow circle with black outline
             context.beginPath();
@@ -103,17 +106,24 @@
             context.stroke();
 
             // load image for red radiation smiley
-            const img = new Image();
-            img.onload = function() {
+            if (smiley === undefined) {
+                smiley = new Image();
+                // allow download canvas as image
+                smiley.setAttribute('crossOrigin', 'anonymous');
+                smiley.onload = function() {
+                    const height = canvas.height / 2;
+                    const width = canvas.width / 2;
+                    context.drawImage(smiley, centerX - height / 2, centerY - width / 2, height, width);
+                    imageLoaded = true;
+                };
+                smiley.src = "https://i.ibb.co/NxNvnK7/evil-smiley.png";
+            } else {
                 const height = canvas.height / 2;
                 const width = canvas.width / 2;
-                context.drawImage(img, centerX - height / 2, centerY - width / 2, height, width);
+                context.drawImage(smiley, centerX - height / 2, centerY - width / 2, height, width);
             }
-            img.src = "https://i.ibb.co/NxNvnK7/evil-smiley.png";
-            // allow download canvas as image
-            img.setAttribute('crossOrigin', 'anonymous');
 
-            var fontSize = Math.floor(canvas.height * 0.05) + "px ";
+            let fontSize = Math.floor(canvas.height * 0.05) + "px ";
             context.font = fontSize + "Varela Round";
             context.textAlign = "center";
 
@@ -121,18 +131,18 @@
             context.fillStyle = "black";
             const upper = document.getElementById('upperTextInput').value;
             const lower = document.getElementById('lowerTextInput').value;
-            var upperLen = context.measureText(upper);
-            var lowerLen = context.measureText(lower);
-            var radius = canvas.height / 4.5;
-            var upperAngle = Math.PI * upperLen.width / 55 / canvas.height * 100; // radians
-            drawTextAlongArc(context, upper, centerX, centerY, radius, upperAngle);
-            var lowerAngle = Math.PI * lowerLen.width / 55 / canvas.height * 100; // radians
-            drawTextAlongArc(context, lower, centerX, centerY, radius, lowerAngle, false);
+            let upperLen = context.measureText(upper);
+            let lowerLen = context.measureText(lower);
+            let textRadius = canvas.height / 4.5;
+            let upperAngle = Math.PI * upperLen.width / 55 / canvas.height * 100; // radians
+            drawTextAlongArc(context, upper, centerX, centerY, textRadius, upperAngle);
+            let lowerAngle = Math.PI * lowerLen.width / 55 / canvas.height * 100; // radians
+            drawTextAlongArc(context, lower, centerX, centerY, textRadius, lowerAngle, false);
         }
 
         function downloadImage() {
-            var download = document.getElementById("download");
-            var image = document.getElementById("smileCanvas").toDataURL("image/png")
+            let download = document.getElementById("download");
+            let image = document.getElementById("smileCanvas").toDataURL("image/png")
                 .replace("image/png", "image/octet-stream");
             download.setAttribute("href", image);
         }
