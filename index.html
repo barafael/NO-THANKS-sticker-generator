@@ -8,7 +8,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
     <title>
-        Contrarian Sticker Generator
+        No-Thanks Sticker Generator
     </title>
     <style>
         #main {
@@ -36,15 +36,91 @@
             background-color: #ffff00;
             color: black;
         }
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: yellow;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: gray;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: red;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        .mode {
+            font-size: 1.5rem;
+            font-family: sans-serif;
+            padding: 2rem 0 2rem 2rem;
+            color: black;
+        }
+
     </style>
 </head>
 
 <body>
     <div id="main" role="main">
-        <canvas id="smileCanvas" width="100" height="100" style="border:1px solid #000000;">
+        <canvas id="stickerCanvas" width="100" height="100" style="border:1px solid #000000;">
             < !-- Provide fallback -->
         </canvas>
     </div>
+    <div id="mode-select" class="mode">
+        Nein Danke! <label class="switch">
+            <input type="checkbox" id="modeswitch">
+            <span class="slider round"></span>
+        </label> Ein Herz Für Kinder
+    </div>
+
     <input type="text" placeholder="Gegen Regen" id="lowerTextInput" name="lower text" maxlength="30" size="10">
     <input type="text" placeholder="Pro Klo" id="upperTextInput" name="upper text" maxlength="30" size="10">
 
@@ -53,7 +129,21 @@
     </a>
 
     <script>
+        var noThanksSelected = true;
+        var defaultColor = "yellow";
+        let toggleswitch = document.getElementById("modeswitch");
+        toggleswitch.addEventListener('change',function(){
+            if(this.checked) {
+                defaultColor = "red";
+                noThanksSelected = false;
+            } else {
+                defaultColor = "yellow";
+                noThanksSelected = true;
+            }
+        });
+
         let smiley;
+        let heart;
 
         function drawTextAlongArc(context, str, centerX, centerY, radius, angle, low = true) {
             context.save();
@@ -79,14 +169,68 @@
             context.restore();
         }
 
-        function smileCanvas() {
-            let c = $('#smileCanvas');
+        function drawContent() {
+            if (noThanksSelected) {
+                noThanks();
+            } else {
+                aHeartForX();
+            }
+        }
+
+        function aHeartForX() {
+            let c = $('#stickerCanvas');
             let ct = c.get(0).getContext('2d');
             let container = $(c).parent();
             c.attr('width', $(container).width());
             c.attr('height', $(container).width());
 
-            let canvas = document.getElementById('smileCanvas');
+            let canvas = document.getElementById('stickerCanvas');
+
+            let context = canvas.getContext('2d');
+
+            context.fillStyle = "white";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+
+            // load image for heart
+            if (heart === undefined) {
+                heart = new Image();
+                // allow download canvas as image
+                heart.onload = function() {
+                    const height = canvas.height / 2;
+                    const width = canvas.width / 2;
+                    context.drawImage(heart, centerX - height / 2, centerY - width / 2, height, width);
+                    imageLoaded = true;
+                };
+                heart.src = "Ein_Herz.png";
+            } else {
+                const height = canvas.height / 2;
+                const width = canvas.width / 2;
+                context.drawImage(heart, centerX - height / 2, centerY - width / 2, height, width);
+            }
+
+            let fontSize = Math.floor(canvas.height * 0.05) + "px ";
+            context.font = fontSize + "Varela Round";
+            context.textAlign = "center";
+
+            // Draw text
+            context.fillStyle = "black";
+            const text = document.getElementById('lowerTextInput').value;
+            const text2 = document.getElementById('upperTextInput').value;
+            context.fillText(text, centerX, centerY/5);
+            context.fillText(text2, centerX, centerY/3);
+        }
+
+        function noThanks() {
+            let c = $('#stickerCanvas');
+            let ct = c.get(0).getContext('2d');
+            let container = $(c).parent();
+            c.attr('width', $(container).width());
+            c.attr('height', $(container).width());
+
+            let canvas = document.getElementById('stickerCanvas');
 
             let context = canvas.getContext('2d');
 
@@ -142,23 +286,27 @@
 
         function downloadImage() {
             let download = document.getElementById("download");
-            let image = document.getElementById("smileCanvas").toDataURL("image/png")
+            let image = document.getElementById("stickerCanvas").toDataURL("image/png")
                 .replace("image/png", "image/octet-stream");
             download.setAttribute("href", image);
         }
 
         $(document).ready(function() {
-            $(window).resize(smileCanvas);
+            $(window).resize(stickerCanvas);
 
-            smileCanvas();
+            drawContent();
         });
 
         $("#upperTextInput").on('change keydown paste input', function() {
-            smileCanvas();
+            drawContent();
         });
 
         $("#lowerTextInput").on('change keydown paste input', function() {
-            smileCanvas();
+            drawContent();
+        });
+
+        $("#modeswitch").on('change', function() {
+            drawContent();
         });
     </script>
 </body>
