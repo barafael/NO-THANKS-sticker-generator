@@ -15,6 +15,7 @@
             display: block;
             width: 100%;
         }
+
         input[type=text] {
             border: none;
             width: 100%;
@@ -24,7 +25,7 @@
             background-color: #ffff00;
             color: black;
         }
-        
+
         button[type=button] {
             border: solid;
             border-radius: 2px;
@@ -109,14 +110,13 @@
             if (smiley === undefined) {
                 smiley = new Image();
                 // allow download canvas as image
-                smiley.setAttribute('crossOrigin', 'anonymous');
                 smiley.onload = function() {
                     const height = canvas.height / 2;
                     const width = canvas.width / 2;
                     context.drawImage(smiley, centerX - height / 2, centerY - width / 2, height, width);
                     imageLoaded = true;
                 };
-                smiley.src = "https://i.ibb.co/NxNvnK7/evil-smiley.png";
+                smiley.src = "evil-smiley.png";
             } else {
                 const height = canvas.height / 2;
                 const width = canvas.width / 2;
